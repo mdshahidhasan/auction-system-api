@@ -1,4 +1,6 @@
-namespace AuctionSystem.API.Models.Product;
+using Microsoft.AspNetCore.Http;
+
+namespace AuctionSystem.Core.Models.Product;
 
 public class ProductWriteModel
 {
@@ -12,4 +14,6 @@ public class ProductWriteModel
     public decimal? AskingPrice { get; set; }
     public decimal? StartingPrice { get; set; }
     public decimal? MinBidIncrement { get; set; }
+
+    public List<IFormFile> Photos { get; set; } = new();
 }
