@@ -1,4 +1,6 @@
-namespace AuctionSystem.API.Models.User;
+using Microsoft.AspNetCore.Http;
+
+namespace AuctionSystem.Core.Models.User;
 
 public class UserUpdateModel
 {

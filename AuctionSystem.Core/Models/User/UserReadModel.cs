@@ -1,4 +1,4 @@
-namespace AuctionSystem.API.Models.User;
+namespace AuctionSystem.Core.Models.User;
 
 public class UserReadModel
 {
