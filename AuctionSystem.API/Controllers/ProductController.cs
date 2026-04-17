@@ -1,3 +1,4 @@
+using AuctionSystem.Core.Entities;
 using AuctionSystem.Core.Interfaces.Apps;
 using AuctionSystem.Core.Models;
 using AuctionSystem.Core.Models.Product;
@@ -21,11 +22,11 @@ public class ProductController : ApiBaseController
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<ServiceResult<List<ProductReadModel>>>> GetProducts()
+    public async Task<ActionResult<ServiceResult<List<ProductReadModel>>>> GetProducts(ProductQueryModel queryModel)
     {
         _logger.LogDebug("GetProducts()");
 
-        var result = await _productApp.GetProducts();
+        var result = await _productApp.GetProducts(queryModel);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }

@@ -32,22 +32,22 @@ public class BidController : ApiBaseController
     }
 
     [HttpGet("public-bids")]
-    public async Task<ActionResult<ServiceResult<List<BidPublicReadModel>>>> GetPublicBids([FromRoute] int productId)
+    public async Task<ActionResult<ServiceResult<List<BidPublicReadModel>>>> GetPublicBids([FromRoute] int productId, [FromQuery] BidQueryModel queryModel)
     {
         _logger.LogDebug("GetPublicBids()");
 
-        var result = await _bidApp.GetPublicBids(productId);
+        var result = await _bidApp.GetPublicBids(productId, queryModel);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
 
     [Authorize]
     [HttpGet("bids")]
-    public async Task<ActionResult<ServiceResult<List<BidReadModel>>>> GetBids([FromRoute] int productId)
+    public async Task<ActionResult<ServiceResult<List<BidReadModel>>>> GetBids([FromRoute] int productId, [FromQuery] BidQueryModel queryModel)
     {
         _logger.LogDebug("GetBids()");
 
-        var result = await _bidApp.GetBids(productId, UserId, UserRole);
+        var result = await _bidApp.GetBids(productId, UserId, UserRole, queryModel);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }

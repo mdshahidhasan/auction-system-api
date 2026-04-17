@@ -1,3 +1,4 @@
+using AuctionSystem.Core.Entities;
 using AuctionSystem.Core.Interfaces.Apps;
 using AuctionSystem.Core.Models;
 using AuctionSystem.Core.Models.User;
@@ -21,11 +22,11 @@ public class UserController : ApiBaseController
 
     [Authorize(Roles = "admin")]
     [HttpGet]
-    public async Task<ActionResult<ServiceResult<List<UserReadModel>>>> GetUsers()
+    public async Task<ActionResult<ServiceResult<List<UserReadModel>>>> GetUsers(UserQueryModel queryModel)
     {
         _logger.LogDebug("GetUsers()");
 
-        var result = await _userApp.GetUsers();
+        var result = await _userApp.GetUsers(queryModel);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
