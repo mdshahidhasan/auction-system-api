@@ -20,6 +20,17 @@ public class UserController : ApiBaseController
         _userApp = userApp;
     }
 
+    [AllowAnonymous]
+    [HttpPost]
+    public async Task<ActionResult<ServiceResult<UserReadModel>>> CreateUser([FromBody] UserWriteModel model)
+    {
+        _logger.LogDebug("CreateUser() {email}", model.Email);
+
+        var result = await _userApp.CreateUser(model);
+
+        return new JsonResult(result) { StatusCode = result.Code };
+    }
+
     [Authorize(Roles = "admin")]
     [HttpGet]
     public async Task<ActionResult<ServiceResult<List<UserReadModel>>>> GetUsers(UserQueryModel queryModel)

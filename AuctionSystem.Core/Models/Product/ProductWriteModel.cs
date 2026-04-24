@@ -6,6 +6,7 @@ public class ProductWriteModel
 {
     public string Title { get; set; } = string.Empty;
     public string Brand { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
 
     public DateTime? AuctionStarts { get; set; }
