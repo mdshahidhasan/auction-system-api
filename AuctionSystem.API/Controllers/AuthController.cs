@@ -20,17 +20,6 @@ public class AuthController : ApiBaseController
     }
 
     [AllowAnonymous]
-    [HttpPost("signup")]
-    public async Task<ActionResult<ServiceResult>> Register([FromBody] AuthRegisterModel model)
-    {
-        _logger.LogDebug("Register() {email}", model.Email);
-
-        var result = await _authApp.Register(model);
-
-        return new JsonResult(result) { StatusCode = result.Code };
-    }
-
-    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<ServiceResult<Token>>> Login([FromBody] AuthLoginModel model)
     {
