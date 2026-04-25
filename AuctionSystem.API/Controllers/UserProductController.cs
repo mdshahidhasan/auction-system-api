@@ -21,21 +21,21 @@ public class UserProductController : ApiBaseController
     }
 
     [HttpPost]
-    public async Task<ActionResult<ServiceResult<ProductReadModel>>> CreateProduct([FromForm] ProductWriteModel model)
+    public async Task<ActionResult<ServiceResult<ProductReadModel>>> CreateProduct([FromRoute] int userId, [FromForm] ProductWriteModel model)
     {
         _logger.LogDebug("CreateProduct() {@model}", model);
 
-        var result = await _userProductApp.CreateProduct(UserId, model);
+        var result = await _userProductApp.CreateProduct(UserId, userId, model);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
 
     [HttpGet]
-    public async Task<ActionResult<ServiceResult<List<ProductReadModel>>>> GetUserProducts()
+    public async Task<ActionResult<ServiceResult<List<ProductReadModel>>>> GetUserProducts([FromRoute] int userId)
     {
         _logger.LogDebug("GetUserProducts()");
 
-        var result = await _userProductApp.GetUserProducts(UserId);
+        var result = await _userProductApp.GetUserProducts(UserId, userId);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
