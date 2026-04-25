@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
     <ProjectReference Include="..\AuctionSystem.Core\AuctionSystem.Core.csproj" />
   </ItemGroup>
 
