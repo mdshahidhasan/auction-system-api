@@ -31,6 +31,7 @@ public class BidController : ApiBaseController
         return new JsonResult(result) { StatusCode = result.Code };
     }
 
+    [AllowAnonymous]
     [HttpGet("public-bids")]
     public async Task<ActionResult<ServiceResult<List<BidPublicReadModel>>>> GetPublicBids([FromRoute] int productId, [FromQuery] BidQueryModel queryModel)
     {
@@ -48,6 +49,16 @@ public class BidController : ApiBaseController
         _logger.LogDebug("GetBids()");
 
         var result = await _bidApp.GetBids(productId, UserId, UserRole, queryModel);
+
+        return new JsonResult(result) { StatusCode = result.Code };
+    }
+
+    [HttpGet("~/me/bids")]
+    public async Task<ActionResult<ServiceResult<List<MyBidReadModel>>>> GetMyBids()
+    {
+        _logger.LogDebug("GetMyBids()");
+
+        var result = await _bidApp.GetMyBids(UserId);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
