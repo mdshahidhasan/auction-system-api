@@ -11,12 +11,12 @@ namespace AuctionSystem.App.Apps;
 
 public class UserApp : IUserApp
 {
-    private readonly IUserService _userService;
+    private readonly IUserDataService _userService;
     private readonly IPasswordService _passwordService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UserApp(IUserService userService, IPasswordService passwordService, IUnitOfWork unitOfWork, IMapper mapper)
+    public UserApp(IUserDataService userService, IPasswordService passwordService, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _userService = userService;
         _passwordService = passwordService;
