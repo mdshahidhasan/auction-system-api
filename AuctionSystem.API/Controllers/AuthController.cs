@@ -1,22 +1,36 @@
 using AuctionSystem.Core.Interfaces.Apps;
 using AuctionSystem.Core.Models;
 using AuctionSystem.Core.Models.Auth;
+using AuctionSystem.Core.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuctionSystem.API.Controllers;
 
 [ApiController]
-[Route("/")]
+[Route("auth")]
 public class AuthController : ApiBaseController
 {
     private readonly ILogger<AuthController> _logger;
     private readonly IAuthApp _authApp;
+    private readonly IUserApp _userApp;
 
-    public AuthController(ILogger<AuthController> logger, IAuthApp authApp)
+    public AuthController(ILogger<AuthController> logger, IAuthApp authApp, IUserApp userApp)
     {
         _logger = logger;
         _authApp = authApp;
+        _userApp = userApp;
+    }
+
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<ActionResult<ServiceResult<UserReadModel>>> Register([FromBody] UserWriteModel model)
+    {
+        _logger.LogDebug("Register() {email}", model.Email);
+
+        var result = await _userApp.CreateUser(model);
+
+        return new JsonResult(result) { StatusCode = result.Code };
     }
 
     [AllowAnonymous]
