@@ -68,8 +68,8 @@ builder.Services.AddCors(options =>
 // Application layer
 builder.Services.AddScoped<IAuthApp, AuthApp>();
 builder.Services.AddScoped<IUserApp, UserApp>();
+builder.Services.AddScoped<IUserAdminApp, UserAdminApp>();
 builder.Services.AddScoped<IProductApp, ProductApp>();
-builder.Services.AddScoped<IUserProductApp, UserProductApp>();
 builder.Services.AddScoped<IBidApp, BidApp>();
 
 // Infrastructure and security services
