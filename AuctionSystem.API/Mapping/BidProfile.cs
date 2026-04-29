@@ -10,6 +10,6 @@ public class BidProfile : Profile
     {
         CreateMap<BidWriteModel, Bid>();
         CreateMap<Bid, BidReadModel>();
-        CreateMap<Bid, BidPublicReadModel>();
+        CreateMap<Bid, BidPrivateReadModel>();
     }
 }

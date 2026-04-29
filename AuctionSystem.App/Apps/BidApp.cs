@@ -2,7 +2,6 @@ using AuctionSystem.Core.Interfaces.Apps;
 using AuctionSystem.Core.Interfaces.Services;
 using AuctionSystem.Core.Models;
 using AuctionSystem.Core.Models.Bid;
-using AuctionSystem.Core.Models.User;
 using AutoMapper;
 using AuctionSystem.Core.Entities;
 using AuctionSystem.App.Validators;
@@ -94,7 +93,7 @@ public class BidApp : IBidApp
 
             await _unitOfWork.CommitAsync();
 
-            var bidReadModel = await BuildBidReadModel(createdBid);
+            var bidReadModel = _mapper.Map<BidReadModel>(createdBid);
 
             return new ServiceResult<BidReadModel>
             {
@@ -115,7 +114,7 @@ public class BidApp : IBidApp
         }
     }
 
-    public async Task<ServiceResult<List<BidPublicReadModel>>> GetPublicBids(int productId, BidQueryModel queryModel)
+    public async Task<ServiceResult<List<BidReadModel>>> GetBids(int productId, BidQueryModel queryModel)
     {
         var searchModel = new BidSearchModel
         {
@@ -125,23 +124,23 @@ public class BidApp : IBidApp
         };
 
         ServiceResult<List<Bid>> bids = await _bidService.GetBids(searchModel);
-        var publicBidReadModels = await BuildBidPublicReadModels(bids.Data ?? new List<Bid>());
+        var BidReadModels = _mapper.Map<List<BidReadModel>>(bids.Data ?? new List<Bid>());
 
-        return new ServiceResult<List<BidPublicReadModel>>
+        return new ServiceResult<List<BidReadModel>>
         {
             Code = bids.Code,
             Message = bids.Message,
-            Data = publicBidReadModels,
+            Data = BidReadModels,
             TotalCount = bids.TotalCount
         };
     }
 
-    public async Task<ServiceResult<List<BidReadModel>>> GetBids(int productId, int requesterUserId, string? requesterRole, BidQueryModel queryModel)
+    public async Task<ServiceResult<List<BidPrivateReadModel>>> GetPrivateBids(int requesterUserId, string? requesterRole, int productId, BidQueryModel queryModel)
     {
         var product = await _productService.GetProductById(productId);
         if (product is null)
         {
-            return new ServiceResult<List<BidReadModel>>
+            return new ServiceResult<List<BidPrivateReadModel>>
             {
                 Code = 404,
                 Message = "Product not found."
@@ -150,7 +149,7 @@ public class BidApp : IBidApp
 
         if (product.UserId != requesterUserId && !IsAdmin(requesterRole))
         {
-            return new ServiceResult<List<BidReadModel>>
+            return new ServiceResult<List<BidPrivateReadModel>>
             {
                 Code = 403,
                 Message = "Forbidden: You do not have permission to view detailed bids for this product."
@@ -165,9 +164,9 @@ public class BidApp : IBidApp
         };
 
         ServiceResult<List<Bid>> bids = await _bidService.GetBids(searchModel);
-        var bidReadModels = await BuildBidReadModels(bids.Data ?? new List<Bid>());
+        var bidReadModels = _mapper.Map<List<BidPrivateReadModel>>(bids.Data ?? new List<Bid>());
 
-        return new ServiceResult<List<BidReadModel>>
+        return new ServiceResult<List<BidPrivateReadModel>>
         {
             Code = bids.Code,
             Message = bids.Message,
@@ -193,60 +192,6 @@ public class BidApp : IBidApp
         };
     }
 
-    private async Task<BidReadModel> BuildBidReadModel(Bid bid)
-    {
-        var bidReadModel = _mapper.Map<BidReadModel>(bid);
-        var user = await _userService.GetUserById(bid.UserId);
-
-        bidReadModel.User = user is null
-            ? new UserReadModel()
-            : _mapper.Map<UserReadModel>(user);
-
-        return bidReadModel;
-    }
-
-    private async Task<List<BidReadModel>> BuildBidReadModels(List<Bid> bids)
-    {
-        var users = new Dictionary<int, UserReadModel?>();
-        var bidReadModels = new List<BidReadModel>();
-
-        foreach (var bid in bids)
-        {
-            if (!users.ContainsKey(bid.UserId))
-            {
-                var user = await _userService.GetUserById(bid.UserId);
-                users[bid.UserId] = user is null ? null : _mapper.Map<UserReadModel>(user);
-            }
-
-            var bidReadModel = _mapper.Map<BidReadModel>(bid);
-            bidReadModel.User = users[bid.UserId] ?? new UserReadModel();
-
-            bidReadModels.Add(bidReadModel);
-        }
-
-        return bidReadModels;
-    }
-
-    private async Task<List<BidPublicReadModel>> BuildBidPublicReadModels(List<Bid> bids)
-    {
-        var publicBidReadModels = _mapper.Map<List<BidPublicReadModel>>(bids);
-        var users = new Dictionary<int, string?>();
-
-        for (var i = 0; i < bids.Count; i++)
-        {
-            var bid = bids[i];
-
-            if (!users.ContainsKey(bid.UserId))
-            {
-                var user = await _userService.GetUserById(bid.UserId);
-                users[bid.UserId] = user is null ? null : $"{user.FirstName} {user.LastName}".Trim();
-            }
-
-            publicBidReadModels[i].UserFullName = users[bid.UserId];
-        }
-
-        return publicBidReadModels;
-    }
 
     private static bool IsAuctionActive(Product product)
     {

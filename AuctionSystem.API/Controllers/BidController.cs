@@ -6,10 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuctionSystem.API.Controllers;
 
-
 [Authorize]
 [ApiController]
-[Route("product/{productId}")]
+[Route("products/{productId}")]
 public class BidController : ApiBaseController
 {
     private readonly ILogger<BidController> _logger;
@@ -32,28 +31,28 @@ public class BidController : ApiBaseController
     }
 
     [AllowAnonymous]
-    [HttpGet("public-bids")]
-    public async Task<ActionResult<ServiceResult<List<BidPublicReadModel>>>> GetPublicBids([FromRoute] int productId, [FromQuery] BidQueryModel queryModel)
+    [HttpGet("bids")]
+    public async Task<ActionResult<ServiceResult<List<BidReadModel>>>> GetPublicBids([FromRoute] int productId, [FromQuery] BidQueryModel queryModel)
     {
         _logger.LogDebug("GetPublicBids()");
 
-        var result = await _bidApp.GetPublicBids(productId, queryModel);
+        var result = await _bidApp.GetBids(productId, queryModel);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
 
     [Authorize]
-    [HttpGet("bids")]
-    public async Task<ActionResult<ServiceResult<List<BidReadModel>>>> GetBids([FromRoute] int productId, [FromQuery] BidQueryModel queryModel)
+    [HttpGet("bids/private")]
+    public async Task<ActionResult<ServiceResult<List<BidPrivateReadModel>>>> GetBids([FromRoute] int productId, [FromQuery] BidQueryModel queryModel)
     {
         _logger.LogDebug("GetBids()");
 
-        var result = await _bidApp.GetBids(productId, UserId, UserRole, queryModel);
+        var result = await _bidApp.GetPrivateBids(UserId, UserRole, productId, queryModel);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
 
-    [HttpGet("~/me/bids")]
+    [HttpGet("~/users/me/bids")]
     public async Task<ActionResult<ServiceResult<List<MyBidReadModel>>>> GetMyBids()
     {
         _logger.LogDebug("GetMyBids()");
