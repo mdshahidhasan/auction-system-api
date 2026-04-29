@@ -1,4 +1,3 @@
-using AuctionSystem.Core.Entities;
 using AuctionSystem.Core.Interfaces.Apps;
 using AuctionSystem.Core.Models;
 using AuctionSystem.Core.Models.User;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AuctionSystem.API.Controllers;
 
 [ApiController]
-[Route("users")]
+[Route("users/me")]
 public class UserController : ApiBaseController
 {
     private readonly ILogger<UserController> _logger;
@@ -20,57 +19,35 @@ public class UserController : ApiBaseController
         _userApp = userApp;
     }
 
-    [AllowAnonymous]
-    [HttpPost]
-    public async Task<ActionResult<ServiceResult<UserReadModel>>> CreateUser([FromBody] UserWriteModel model)
-    {
-        _logger.LogDebug("CreateUser() {email}", model.Email);
-
-        var result = await _userApp.CreateUser(model);
-
-        return new JsonResult(result) { StatusCode = result.Code };
-    }
-
-    [Authorize(Roles = "admin")]
+    [Authorize]
     [HttpGet]
-    public async Task<ActionResult<ServiceResult<List<UserReadModel>>>> GetUsers(UserQueryModel queryModel)
+    public async Task<ActionResult<ServiceResult<UserReadModel>>> GetUserById()
     {
-        _logger.LogDebug("GetUsers()");
+        _logger.LogDebug("GetUserById() {userId}", UserId);
 
-        var result = await _userApp.GetUsers(queryModel);
+        var result = await _userApp.GetUserById(UserId);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
 
     [Authorize]
-    [HttpGet("{userId}")]
-    public async Task<ActionResult<ServiceResult<UserReadModel>>> GetUserById([FromRoute] int userId)
+    [HttpPut]
+    public async Task<ActionResult<ServiceResult>> UpdateUser([FromForm] UserUpdateModel model)
     {
-        _logger.LogDebug("GetUserById() {userId}", userId);
+        _logger.LogDebug("UpdateUser() {@model}", model);
 
-        var result = await _userApp.GetUserById(UserId, userId, UserRole);
+        var result = await _userApp.UpdateUser(UserId, model);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
 
     [Authorize]
-    [HttpPut("{userId}")]
-    public async Task<ActionResult<ServiceResult>> UpdateUser([FromRoute] int userId, [FromForm] UserUpdateModel model)
+    [HttpDelete]
+    public async Task<ActionResult<ServiceResult>> DeleteUser()
     {
-        _logger.LogDebug("UpdateUser() {userId}, {@model}", userId, model);
+        _logger.LogDebug("DeleteUser() {UserId}", UserId);
 
-        var result = await _userApp.UpdateUser(UserId, userId, model);
-
-        return new JsonResult(result) { StatusCode = result.Code };
-    }
-
-    [Authorize]
-    [HttpDelete("{userId}")]
-    public async Task<ActionResult<ServiceResult>> DeleteUser([FromRoute] int userId)
-    {
-        _logger.LogDebug("DeleteUser() {userId}", userId);
-
-        var result = await _userApp.DeleteUser(UserId, userId);
+        var result = await _userApp.DeleteUser(UserId);
 
         return new JsonResult(result) { StatusCode = result.Code };
     }

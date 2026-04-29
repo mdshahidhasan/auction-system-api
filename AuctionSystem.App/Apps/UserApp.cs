@@ -105,18 +105,9 @@ public class UserApp : IUserApp
         };
     }
 
-    public async Task<ServiceResult<UserReadModel>> GetUserById(int requesterUserId, int userId, string? requesterRole)
+    public async Task<ServiceResult<UserReadModel>> GetUserById(int requesterUserId)
     {
-        if (requesterUserId != userId && requesterRole != "Admin")
-        {
-            return new ServiceResult<UserReadModel>
-            {
-                Code = 403,
-                Message = "Forbidden: You do not have permission to access this user's information."
-            };
-        }
-
-        User? user = await _userService.GetUserById(userId);
+        User? user = await _userService.GetUserById(requesterUserId);
         if (user is null)
         {
             return new ServiceResult<UserReadModel>
@@ -136,18 +127,9 @@ public class UserApp : IUserApp
         };
     }
 
-    public async Task<ServiceResult> UpdateUser(int requesterUserId, int userId, UserUpdateModel userUpdateModel)
+    public async Task<ServiceResult> UpdateUser(int requesterUserId, UserUpdateModel userUpdateModel)
     {
-        if (requesterUserId != userId)
-        {
-            return new ServiceResult
-            {
-                Code = 403,
-                Message = "Forbidden: You do not have permission to update this user's information."
-            };
-        }
-
-        User? user = await _userService.GetUserById(userId);
+        User? user = await _userService.GetUserById(requesterUserId);
         if (user == null)
         {
             return new ServiceResult
@@ -161,7 +143,7 @@ public class UserApp : IUserApp
 
         await _userService.UpdateUser(user);
 
-        User? updatedUser = await _userService.GetUserById(userId);
+        User? updatedUser = await _userService.GetUserById(requesterUserId);
         var userReadModel = _mapper.Map<UserReadModel>(updatedUser);
 
         return new ServiceResult<UserReadModel>
@@ -172,18 +154,19 @@ public class UserApp : IUserApp
         };
     }
 
-    public async Task<ServiceResult> DeleteUser(int requesterUserId, int userId)
+    public async Task<ServiceResult> DeleteUser(int requesterUserId)
     {
-        if (requesterUserId != userId)
+        User? user = await _userService.GetUserById(requesterUserId);
+        if (user == null)
         {
             return new ServiceResult
             {
-                Code = 403,
-                Message = "Forbidden: You do not have permission to delete this user's information."
+                Code = 404,
+                Message = "User not found."
             };
         }
 
-        await _userService.DeleteUser(userId);
+        await _userService.DeleteUser(requesterUserId);
 
         return new ServiceResult
         {

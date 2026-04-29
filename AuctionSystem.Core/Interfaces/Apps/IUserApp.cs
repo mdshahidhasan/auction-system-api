@@ -6,8 +6,7 @@ namespace AuctionSystem.Core.Interfaces.Apps;
 public interface IUserApp
 {
     Task<ServiceResult<UserReadModel>> CreateUser(UserWriteModel model);
-    Task<ServiceResult<List<UserReadModel>>> GetUsers(UserQueryModel queryModel);
-    Task<ServiceResult<UserReadModel>> GetUserById(int requesterUserId, int userId, string? requesterRole);
-    Task<ServiceResult> UpdateUser(int requesterUserId, int userId, UserUpdateModel userUpdateModel);
-    Task<ServiceResult> DeleteUser(int requesterUserId, int userId);
+    Task<ServiceResult<UserReadModel>> GetUserById(int requesterUserId);
+    Task<ServiceResult> UpdateUser(int requesterUserId, UserUpdateModel userUpdateModel);
+    Task<ServiceResult> DeleteUser(int requesterUserId);
 }
