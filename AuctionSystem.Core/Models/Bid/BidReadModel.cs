@@ -8,6 +8,8 @@ public class BidReadModel
 
     public int UserId { get; set; }
     public string? UserFullName { get; set; }
+
+    public string? BidderPhotoUrl { get; set; } = string.Empty;
     public int ProductId { get; set; }
     public decimal Amount { get; set; }
 }

@@ -55,7 +55,7 @@ public class UserApp : IUserApp
 
             var user = _mapper.Map<User>(model);
             user.Password = _passwordService.HashPassword(model.Password);
-            user.Role = "User";
+            user.Role = "Customer";
             user.IsActive = true;
             user.IsVerified = false;
 
@@ -140,6 +140,10 @@ public class UserApp : IUserApp
         }
 
         user = _mapper.Map(userUpdateModel, user);
+
+        user.UpdatedAt = DateTime.UtcNow;
+
+        //Needs to implement photo update
 
         await _userService.UpdateUser(user);
 

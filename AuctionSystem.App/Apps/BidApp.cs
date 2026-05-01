@@ -5,6 +5,7 @@ using AuctionSystem.Core.Models.Bid;
 using AutoMapper;
 using AuctionSystem.Core.Entities;
 using AuctionSystem.App.Validators;
+using AuctionSystem.Core.Models.User;
 
 namespace AuctionSystem.App.Apps;
 
@@ -126,6 +127,13 @@ public class BidApp : IBidApp
         ServiceResult<List<Bid>> bids = await _bidService.GetBids(searchModel);
         var BidReadModels = _mapper.Map<List<BidReadModel>>(bids.Data ?? new List<Bid>());
 
+        foreach (var bidReadModel in BidReadModels)
+        {
+            var bidder = await _userService.GetUserById(bidReadModel.UserId);
+            bidReadModel.UserFullName = bidder != null ? $"{bidder.FirstName} {bidder.LastName}" : "Unknown User";
+            bidReadModel.BidderPhotoUrl = bidder?.PhotoPath ?? string.Empty;
+        }
+
         return new ServiceResult<List<BidReadModel>>
         {
             Code = bids.Code,
@@ -138,6 +146,7 @@ public class BidApp : IBidApp
     public async Task<ServiceResult<List<BidPrivateReadModel>>> GetPrivateBids(int requesterUserId, string? requesterRole, int productId, BidQueryModel queryModel)
     {
         var product = await _productService.GetProductById(productId);
+
         if (product is null)
         {
             return new ServiceResult<List<BidPrivateReadModel>>
@@ -164,7 +173,15 @@ public class BidApp : IBidApp
         };
 
         ServiceResult<List<Bid>> bids = await _bidService.GetBids(searchModel);
+
         var bidReadModels = _mapper.Map<List<BidPrivateReadModel>>(bids.Data ?? new List<Bid>());
+
+        foreach (var bidReadModel in bidReadModels)
+        {
+            var bidder = await _userService.GetUserById(bidReadModel.Id);
+            var bidderReadModel = _mapper.Map<UserReadModel>(bidder);
+            bidReadModel.User = bidderReadModel;
+        }
 
         return new ServiceResult<List<BidPrivateReadModel>>
         {
@@ -178,11 +195,6 @@ public class BidApp : IBidApp
     public async Task<ServiceResult<List<MyBidReadModel>>> GetMyBids(int userId)
     {
         var bids = await _bidService.GetMyBids(userId);
-
-        foreach (var bid in bids)
-        {
-            bid.IsWinning = bid.CurrentHighestBid.HasValue && bid.MyBidAmount == bid.CurrentHighestBid.Value;
-        }
 
         return new ServiceResult<List<MyBidReadModel>>
         {

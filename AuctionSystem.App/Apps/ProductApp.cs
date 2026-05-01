@@ -35,6 +35,8 @@ public class ProductApp : IProductApp
         ServiceResult<List<Product>> products = await _productService.GetProducts(searchModel);
         var productReadModels = _mapper.Map<List<ProductReadModel>>(products.Data ?? new List<Product>());
 
+        // Fetch photos for each product
+
         return new ServiceResult<List<ProductReadModel>>
         {
             Code = products.Code,
@@ -57,6 +59,9 @@ public class ProductApp : IProductApp
         }
 
         var productReadModel = _mapper.Map<ProductReadModel>(product);
+
+        var photos = await _productPhotoService.GetPhotosByProductId(product.Id);
+        productReadModel.Photos = photos;
 
         return new ServiceResult<ProductReadModel>
         {
@@ -92,20 +97,12 @@ public class ProductApp : IProductApp
 
             var createdProduct = await _productService.CreateProduct(product, _unitOfWork.Transaction);
 
-            foreach (var photo in productWriteModel.Photos)
-            {
-                await _productPhotoService.UploadPhotos(new ProductPhoto
-                {
-                    ProductId = createdProduct.Id,
-                    PhotoOrder = productWriteModel.Photos.IndexOf(photo) + 1,
-                    PhotoUrl = photo.FileName
-                }, _unitOfWork.Transaction);
-            }
+            // Handle photo uploads
 
             await _unitOfWork.CommitAsync();
 
             var productReadModel = _mapper.Map<ProductReadModel>(createdProduct);
-            productReadModel.PhotoUrls = productWriteModel.Photos.Select(photo => photo.FileName).ToList();
+
 
             return new ServiceResult<ProductReadModel>
             {
@@ -143,7 +140,7 @@ public class ProductApp : IProductApp
             for (var i = 0; i < userProducts.Count; i++)
             {
                 var photos = await _productPhotoService.GetPhotosByProductId(userProducts[i].Id);
-                productReadModels[i].PhotoUrls = photos.OrderBy(photo => photo.PhotoOrder).Select(photo => photo.PhotoUrl).ToList();
+                productReadModels[i].Photos = photos;
             }
 
             return new ServiceResult<List<ProductReadModel>>

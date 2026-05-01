@@ -16,5 +16,5 @@ public class ProductWriteModel
     public decimal? StartingPrice { get; set; }
     public decimal? MinBidIncrement { get; set; }
 
-    public List<IFormFile> Photos { get; set; } = new();
+    public List<ProductPhotoUpload> Photos { get; set; } = new();
 }

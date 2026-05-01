@@ -1,3 +1,5 @@
+using AuctionSystem.Core.Entities;
+
 namespace AuctionSystem.Core.Models.Product;
 
 public class ProductReadModel
@@ -14,7 +16,7 @@ public class ProductReadModel
     public string Brand { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public List<string> PhotoUrls { get; set; } = new();
+    public List<ProductPhoto> Photos { get; set; } = new();
 
     public string AuctionStatus { get; set; } = string.Empty;
     public DateTime AuctionStarts { get; set; }
