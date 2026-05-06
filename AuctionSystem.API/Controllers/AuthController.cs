@@ -43,40 +43,40 @@ public class AuthController : ApiBaseController
 
         return new JsonResult(result) { StatusCode = result.Code };
     }
+    /*
+        [AllowAnonymous]
+        [HttpPost("verify-email")]
+        public async Task<ActionResult<ServiceResult>> VerifyEmail([FromBody] AuthVerifyEmailModel model)
+        {
+            _logger.LogDebug("VerifyEmail() {email}", model.Email);
 
-    [AllowAnonymous]
-    [HttpPost("verify-email")]
-    public async Task<ActionResult<ServiceResult>> VerifyEmail([FromBody] AuthVerifyEmailModel model)
-    {
-        _logger.LogDebug("VerifyEmail() {email}", model.Email);
+            var result = await _authApp.VerifyEmail(model);
 
-        var result = await _authApp.VerifyEmail(model);
+            return new JsonResult(result) { StatusCode = result.Code };
+        }
 
-        return new JsonResult(result) { StatusCode = result.Code };
-    }
+        [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult<ServiceResult>> ForgotPassword([FromBody] AuthForgotPasswordModel model)
+        {
+            _logger.LogDebug("ForgotPassword() {email}", model.Email);
 
-    [AllowAnonymous]
-    [HttpPost("forgot-password")]
-    public async Task<ActionResult<ServiceResult>> ForgotPassword([FromBody] AuthForgotPasswordModel model)
-    {
-        _logger.LogDebug("ForgotPassword() {email}", model.Email);
+            var result = await _authApp.ForgotPassword(model);
 
-        var result = await _authApp.ForgotPassword(model);
+            return new JsonResult(result) { StatusCode = result.Code };
+        }
 
-        return new JsonResult(result) { StatusCode = result.Code };
-    }
+        [AllowAnonymous]
+        [HttpPost("reset-password")]
+        public async Task<ActionResult<ServiceResult>> ResetPassword([FromBody] AuthResetPasswordModel model)
+        {
+            _logger.LogDebug("ResetPassword() {model}", model);
 
-    [AllowAnonymous]
-    [HttpPost("reset-password")]
-    public async Task<ActionResult<ServiceResult>> ResetPassword([FromBody] AuthResetPasswordModel model)
-    {
-        _logger.LogDebug("ResetPassword() {model}", model);
+            var result = await _authApp.ResetPassword(model);
 
-        var result = await _authApp.ResetPassword(model);
-
-        return new JsonResult(result) { StatusCode = result.Code };
-    }
-
+            return new JsonResult(result) { StatusCode = result.Code };
+        }
+    */
     [Authorize]
     [HttpPost("change-password")]
     public async Task<ActionResult<ServiceResult>> ChangePassword([FromBody] AuthChangePasswordModel model)

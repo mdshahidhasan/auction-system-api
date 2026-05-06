@@ -73,7 +73,6 @@ builder.Services.AddScoped<IProductApp, ProductApp>();
 builder.Services.AddScoped<IBidApp, BidApp>();
 
 // Infrastructure and security services
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

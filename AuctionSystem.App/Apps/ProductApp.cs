@@ -163,6 +163,18 @@ public class ProductApp : IProductApp
 
     public async Task<ServiceResult> UpdateProduct(int requesterUserId, int productId, ProductUpdateModel productUpdateModel)
     {
+        var updateProductValidator = new UpdateProductValidator();
+        var validationResult = updateProductValidator.Validate(productUpdateModel);
+
+        if (!validationResult.IsValid)
+        {
+            return new ServiceResult
+            {
+                Code = 400,
+                Message = string.Join("; ", validationResult.Errors.Select(error => error.ErrorMessage))
+            };
+        }
+
         if (productUpdateModel.AskingPrice.HasValue && productUpdateModel.AskingPrice <= 0 ||
             productUpdateModel.StartingPrice.HasValue && productUpdateModel.StartingPrice <= 0 ||
             productUpdateModel.MinBidIncrement.HasValue && productUpdateModel.MinBidIncrement <= 0)

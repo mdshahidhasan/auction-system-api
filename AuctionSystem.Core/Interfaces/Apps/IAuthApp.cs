@@ -8,8 +8,8 @@ public interface IAuthApp
 {
     Task<ServiceResult<UserReadModel>> Register(UserWriteModel model);
     Task<ServiceResult<Token>> Login(AuthLoginModel model);
-    Task<ServiceResult> VerifyEmail(AuthVerifyEmailModel model);
-    Task<ServiceResult> ForgotPassword(AuthForgotPasswordModel model);
-    Task<ServiceResult> ResetPassword(AuthResetPasswordModel model);
+    //Task<ServiceResult> VerifyEmail(AuthVerifyEmailModel model);
+    //Task<ServiceResult> ForgotPassword(AuthForgotPasswordModel model);
+    //Task<ServiceResult> ResetPassword(AuthResetPasswordModel model);
     Task<ServiceResult> ChangePassword(int requesterUserId, AuthChangePasswordModel model);
 }
