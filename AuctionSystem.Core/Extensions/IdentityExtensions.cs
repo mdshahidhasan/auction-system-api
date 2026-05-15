@@ -36,4 +36,29 @@ public static class IdentityExtensions
 
         return claimsIdentity.FindFirst(claimType)?.Value;
     }
+
+    /// <summary>
+    /// Extension method for ClaimsPrincipal to extract the user ID from JWT claims.
+    /// Used for SignalR hub connections and other contexts where we have ClaimsPrincipal.
+    /// </summary>
+    public static int GetUserIdFromClaims(this ClaimsPrincipal? principal)
+    {
+        if (principal == null)
+        {
+            return 0;
+        }
+
+        // Try multiple common claim types for user ID
+        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier) ??
+                         principal.FindFirst("sub") ??
+                         principal.FindFirst("userId") ??
+                         principal.FindFirst("UserId");
+
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return userId;
+        }
+
+        return 0;
+    }
 }

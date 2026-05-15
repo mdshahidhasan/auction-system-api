@@ -1,11 +1,14 @@
 using AuctionSystem.Core.Interfaces.Apps;
+using AuctionSystem.Core.Interfaces.ExternalServices;
 using AuctionSystem.Core.Interfaces.Services;
 using AuctionSystem.Core.Models;
 using AuctionSystem.Core.Models.Bid;
+using AuctionSystem.Core.Models.SignalR;
 using AutoMapper;
 using AuctionSystem.Core.Entities;
 using AuctionSystem.App.Validators;
 using AuctionSystem.Core.Models.User;
+using Microsoft.Extensions.Logging;
 
 namespace AuctionSystem.App.Apps;
 
@@ -16,14 +19,26 @@ public class BidApp : IBidApp
     private readonly IUserDataService _userService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly ILogger<BidApp> _logger;
 
-    public BidApp(IBidDataService bidService, IProductDataService productService, IUserDataService userService, IUnitOfWork unitOfWork, IMapper mapper)
+    private readonly IAuctionRealtimeNotificationService _realtimeNotificationService;
+
+    public BidApp(
+        IBidDataService bidService,
+        IProductDataService productService,
+        IUserDataService userService,
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        ILogger<BidApp> logger,
+        IAuctionRealtimeNotificationService realtimeNotificationService)
     {
         _bidService = bidService;
         _productService = productService;
         _userService = userService;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _logger = logger;
+        _realtimeNotificationService = realtimeNotificationService;
     }
 
     public async Task<ServiceResult<BidReadModel>> CreateBid(int userId, int productId, BidWriteModel bidWriteModel)
@@ -95,6 +110,40 @@ public class BidApp : IBidApp
             await _unitOfWork.CommitAsync();
 
             var bidReadModel = _mapper.Map<BidReadModel>(createdBid);
+
+            try
+            {
+                var bidderUser = await _userService.GetUserById(userId);
+
+                string bidderDisplayName;
+
+                if (bidderUser == null)
+                {
+                    bidderDisplayName = "Unknown Bidder";
+                }
+                else
+                {
+                    bidderDisplayName = $"{bidderUser.FirstName} {bidderUser.LastName}";
+                }
+
+                var bidUpdateModel = new AuctionBidUpdateModel
+                {
+                    BidId = createdBid.Id,
+                    ProductId = productId,
+                    BidderId = userId,
+                    BidderDisplayName = bidderDisplayName,
+                    BidAmount = createdBid.Amount,
+                    BidPlacedUtcTime = createdBid.CreatedAt,
+                    BidSequenceNumber = createdBid.Id,
+                    IsCurrentHighestBid = true
+                };
+
+                await _realtimeNotificationService.BroadcastNewBidAsync(bidUpdateModel);
+            }
+            catch (Exception notificationException)
+            {
+                _logger.LogError(notificationException, "Error broadcasting bid update: {ErrorMessage}", notificationException.Message);
+            }
 
             return new ServiceResult<BidReadModel>
             {
@@ -218,4 +267,6 @@ public class BidApp : IBidApp
     {
         return string.Equals(requesterRole, "Admin", StringComparison.OrdinalIgnoreCase);
     }
+
+
 }
