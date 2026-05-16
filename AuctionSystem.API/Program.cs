@@ -8,6 +8,7 @@ using AuctionSystem.Core.Interfaces.ExternalServices;
 using AuctionSystem.Core.Interfaces.SecurityServices;
 using AuctionSystem.Core.Interfaces.Services;
 using AuctionSystem.Infra.Services.Data;
+using AuctionSystem.Infra.Services.External;
 using AuctionSystem.Infra.Services.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -103,6 +104,11 @@ builder.Services.AddScoped<IProductPhotoDataService, ProductPhotoDataService>();
 
 
 builder.Services.AddScoped<IAuctionRealtimeNotificationService, AuctionRealtimeNotificationService>();
+builder.Services.AddHttpClient<IEmailService, MailgunEmailService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.mailgun.net/v3/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 
 var app = builder.Build();
 
