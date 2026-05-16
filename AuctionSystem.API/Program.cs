@@ -109,6 +109,7 @@ builder.Services.AddHttpClient<IEmailService, MailgunEmailService>(client =>
     client.BaseAddress = new Uri("https://api.mailgun.net/v3/");
     client.Timeout = TimeSpan.FromSeconds(30);
 });
+builder.Services.AddSingleton<IStorageService, CloudflareR2StorageService>();
 
 var app = builder.Build();
 
